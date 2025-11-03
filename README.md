@@ -1,4 +1,3 @@
-<img width="1309" height="270" alt="image" src="https://github.com/user-attachments/assets/755e1919-7717-4231-9623-6e3695f6d910" /># Hex-Serializer
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ### IMPORTANT: This tool was made for [Dual Attorneys](https://discord.gg/phECHVHCDe). It's only built to handle what we needed for the game.
