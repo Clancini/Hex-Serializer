@@ -1,3 +1,5 @@
+## Hex Serializer
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ### IMPORTANT: This tool was made for [Dual Attorneys](https://discord.gg/phECHVHCDe). It's only built to handle what we needed for the game.
