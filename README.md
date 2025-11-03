@@ -1,15 +1,31 @@
-# Hex-Serializer
+<img width="1309" height="270" alt="image" src="https://github.com/user-attachments/assets/755e1919-7717-4231-9623-6e3695f6d910" /># Hex-Serializer
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ### IMPORTANT: This tool was made for [Dual Attorneys](https://discord.gg/phECHVHCDe). It's only built to handle what we needed for the game.
-**ALSO REMEMBER: This is mostly a portfolio piece rather than a general use library.**
+**ALSO REMEMBER: This is mostly a portfolio piece rather than a general use library. Excluding requests, I'll only update this if I ever touch the one in DA.**
 
 This serializer turns the contents of a binary file into an instance of a class (and viceversa).
 
 It's made to be the easiest possible solution to handle the types we need for our save file and dialogue system. As such, only `bool`, `int`, `float` and `string` are supported.
 
+(Strings are prefixed with an `unsigned short` for length.)
+
 Also, the save file is meant to be relatively small (in the range of a few MBs at most), being the reason streams are currently not used.
+
+**Why not just use JSON or YAML?**
+
+It would for sure have been easier and faster. However, serializing to a binary file allows us to have essentially a free basic obfuscation for the save file along with smaller sizes.
+
+This stops occasional cheaters from tampering with it, while still allowing people who want to dive deeper to actually understand and reverse engineer its structure.
+
+(The PC version of the game is shipped in MONO, so DLLs can be inspected via ILSpy or similar.)
 
 ### Objective
 Since this is originally meant to be used in a game, it's designed so it does the most amount of "slow" work possible in the same time frame (a loading screen).
+
+"Slow" is, in this case, defined as having possibly relatively heavy I/O and Reflection operations (which is why I cache basically everything). `Span<T>` and `Memory<T>` are always preferred over creating more buffers (except in `File.WriteAllBytesAsync()` because the override for `ReadOnlyMemory<T>` is not available in Unity's .NET version).
+
+A given `HexParser` instance can only ever be used on a single type for that reason.
 
 `CachedProperties` exposes `_cachedProperties` to allow integration with our dialogue system.
 
@@ -20,7 +36,7 @@ To all properties you want to serialize/deserialize, simply attach the `[HexOrde
 
 Example:
 ```cs
-public sealed class Data
+public sealed class YourDataClass
 {
   [HexOrder(1)]
   public int SomeIntValue { get; private set; } = 100;
@@ -36,6 +52,22 @@ Output:
 <img width="722" height="87" alt="image" src="https://github.com/user-attachments/assets/c69f8bb8-4d3d-4224-ba11-eae2fc54d846" />
 
 <img width="1417" height="99" alt="image" src="https://github.com/user-attachments/assets/aab4a43a-2f30-4657-a926-ce40a8e7650d" />
+
+All you have to do is:
+```cs
+HexParser<T> parserInstance = new HexParser<YourDataClass>();
+
+parserInstance.SerializeToFile(path, yourDataClassInstance);  // Returns a Task you can await
+
+parserInstance.DeserializeFromFile(path);  // Returns a Task<YourDataClass> you can await and get the deserialized instance from
+```
+
+There's also basically no installation. Just drop the 2 scripts inside your project. (The project is only needed to run the tests.)
+
+### Proof this works
+The project comes with a basic NUnit test.
+
+`HexParser` writes some sample data (sourced from known constants) to a file. The file is then read back and matched against those same constants.
 
 ### Some suggestions
 The best way to work in a group using this, is to assign each person a range of indexes they can use so you don't overwrite one another. That's the way we split gameplay and dialogue variables.
